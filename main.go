@@ -5,14 +5,29 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
+
+var accessToken = ""
+var tokenCreationDate = time.Now()
 
 func main() {
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/token/", tokenHandler)
+	http.HandleFunc("/test/", testHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to the Abios Gaming test exercise web application!")
+}
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	var lofasz = time.Now().Sub(tokenCreationDate) / 10e8
+	fmt.Fprintf(w, "Difference in seconds: %d", lofasz)
+}
+
+func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	url := "https://api.abiosgaming.com/v2/oauth/access_token"
 	payload := strings.NewReader("grant_type=client_credentials&client_id=test-task&client_secret=9179d8d1b253209e193e7dee77e432ea79e541a5909a026a76")
 	req, _ := http.NewRequest("POST", url, payload)
@@ -25,4 +40,5 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(res)
 	fmt.Println(string(body))
 	fmt.Fprintf(w, string(body))
+	tokenCreationDate = time.Now()
 }

@@ -17,6 +17,9 @@ func main() {
 	http.HandleFunc("/token/", tokenHandler)
 	http.HandleFunc("/test/", testHandler)
 	http.HandleFunc("/test2/", test2Handler)
+	http.HandleFunc("/series/live", liveSeriesHandler)
+	http.HandleFunc("/players/live", livePlayersHandler)
+	http.HandleFunc("/teams/live", liveTeamsHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -52,7 +55,6 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 	json.Unmarshal(body, &m)
-	fmt.Println("Your access token for the next hour is: ", m["access_token"])
 	tokenCreationDate = time.Now()
 }
 
@@ -71,4 +73,16 @@ func getToken() {
 	json.Unmarshal(body, &m)
 	fmt.Println("Your access token for the next hour is: ", m["access_token"])
 	tokenCreationDate = time.Now()
+}
+
+func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "smth random")
+}
+
+func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "smth random")
+}
+
+func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "smth random")
 }

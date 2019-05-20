@@ -74,13 +74,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
+	checkIfTokenIsValid()
 	fmt.Fprintf(w, "smth random")
 }
 
 func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
+	checkIfTokenIsValid()
 	fmt.Fprintf(w, "smth random")
 }
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	checkIfTokenIsValid()
 	fmt.Fprintf(w, "smth random")
 }

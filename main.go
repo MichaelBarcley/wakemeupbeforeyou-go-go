@@ -75,6 +75,14 @@ func getToken() {
 	tokenCreationDate = time.Now()
 }
 
+func checkIfTokenIsValid() {
+	var timeSinceTokenCreation = time.Now().Sub(tokenCreationDate) / 10e8
+	fmt.Println("The age of the token is: ", timeSinceTokenCreation)
+	if timeSinceTokenCreation > 3600 || accessToken == "" {
+		getToken()
+	}
+}
+
 func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "smth random")
 }

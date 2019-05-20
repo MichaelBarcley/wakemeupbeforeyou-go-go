@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,6 +16,7 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/token/", tokenHandler)
 	http.HandleFunc("/test/", testHandler)
+	http.HandleFunc("/test2/", test2Handler)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -25,6 +27,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	var lofasz = time.Now().Sub(tokenCreationDate) / 10e8
 	fmt.Fprintf(w, "Difference in seconds: %d", lofasz)
+}
+
+func test2Handler(w http.ResponseWriter, r *http.Request) {
+	var timeSinceTokenCreation = time.Now().Sub(tokenCreationDate) / 10e8
+	if timeSinceTokenCreation > 3600 || accessToken == "" {
+		getToken()
+	}
 }
 
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,5 +49,26 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(res)
 	fmt.Println(string(body))
 	fmt.Fprintf(w, string(body))
+
+	m := make(map[string]interface{})
+	json.Unmarshal(body, &m)
+	fmt.Println("Your access token for the next hour is: ", m["access_token"])
+	tokenCreationDate = time.Now()
+}
+
+func getToken() {
+	url := "https://api.abiosgaming.com/v2/oauth/access_token"
+	payload := strings.NewReader("grant_type=client_credentials&client_id=test-task&client_secret=9179d8d1b253209e193e7dee77e432ea79e541a5909a026a76")
+	req, _ := http.NewRequest("POST", url, payload)
+	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(string(body))
+
+	m := make(map[string]interface{})
+	json.Unmarshal(body, &m)
+	fmt.Println("Your access token for the next hour is: ", m["access_token"])
 	tokenCreationDate = time.Now()
 }

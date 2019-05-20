@@ -21,6 +21,7 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
+// This function will be removed at release, it is used to get token manually if necessary.
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	url := "https://api.abiosgaming.com/v2/oauth/access_token"
 	payload := strings.NewReader("grant_type=client_credentials&client_id=test-task&client_secret=9179d8d1b253209e193e7dee77e432ea79e541a5909a026a76")
@@ -37,7 +38,9 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 	json.Unmarshal(body, &m)
+	accessToken = m["access_token"].(string)
 	tokenCreationDate = time.Now()
+	fmt.Println(accessToken)
 }
 
 func getToken() {
@@ -54,6 +57,7 @@ func getToken() {
 	m := make(map[string]interface{})
 	json.Unmarshal(body, &m)
 	fmt.Println("Your access token for the next hour is: ", m["access_token"])
+	accessToken = m["access_token"].(string)
 	tokenCreationDate = time.Now()
 }
 

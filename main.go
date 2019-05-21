@@ -76,53 +76,46 @@ func checkIfTokenIsValid() {
 	}
 }
 
+func getLiveAbiosData(s string) string {
+	checkIfTokenIsValid()
+	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
+	res, err := http.Get(baseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+
+	switch s {
+	case "players":
+		results := gjson.Get(string(body), "data.#.rosters.#.players")
+		return results.Raw
+	case "teams":
+		results := gjson.Get(string(body), "data.#.rosters.#.teams")
+		return results.Raw
+	default:
+		return string(body)
+	}
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the Abios Gaming test exercise web application!")
 }
 
 func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
-	checkIfTokenIsValid()
-
-	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
-	res, err := http.Get(baseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-
+	liveSeries := getLiveAbiosData("series")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, string(body))
+	fmt.Fprintf(w, liveSeries)
 }
 
 func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
-	checkIfTokenIsValid()
-
-	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
-	res, err := http.Get(baseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	results := gjson.Get(string(body), "data.#.rosters.#.players")
-
+	livePlayers := getLiveAbiosData("players")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, results.String())
+	fmt.Fprintf(w, livePlayers)
 }
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	checkIfTokenIsValid()
-
-	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
-	res, err := http.Get(baseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	results := gjson.Get(string(body), "data.#.rosters.#.teams")
-
+	liveTeams := getLiveAbiosData("teams")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, results.String())
+	fmt.Fprintf(w, liveTeams)
 }

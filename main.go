@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/tidwall/gjson"
 )
 
 var accessToken = ""
@@ -88,6 +90,7 @@ func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
+
 	fmt.Fprintf(w, string(body))
 }
 
@@ -98,5 +101,15 @@ func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	checkIfTokenIsValid()
-	fmt.Fprintf(w, "smth random")
+
+	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
+	res, err := http.Get(baseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	results := gjson.Get(string(body), "data.#.rosters.#.teams")
+
+	fmt.Fprintf(w, results.String())
 }

@@ -96,7 +96,17 @@ func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
 
 func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
 	checkIfTokenIsValid()
-	fmt.Fprintf(w, "smth random")
+
+	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
+	res, err := http.Get(baseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	results := gjson.Get(string(body), "data.#.rosters.#.players")
+
+	fmt.Fprintf(w, results.String())
 }
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {

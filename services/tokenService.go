@@ -16,8 +16,7 @@ var AccessToken = ""
 // TokenCreationDate is the date when the AccessToken was created. On server start it is time.Now() and it is modified in token handling functions.
 var TokenCreationDate = time.Now()
 
-
-// GetToken ...
+// GetToken is responsible for getting a valid token, if the server has an expired one.
 func GetToken() {
 	url := "https://api.abiosgaming.com/v2/oauth/access_token"
 	payload := strings.NewReader("grant_type=client_credentials&client_id=test-task&client_secret=9179d8d1b253209e193e7dee77e432ea79e541a5909a026a76")
@@ -38,7 +37,7 @@ func GetToken() {
 	TokenCreationDate = time.Now()
 }
 
-// CheckIfTokenIsValid ...
+// CheckIfTokenIsValid checks if the current access token stored on the server is still valid or needs to get a new one from Abios API.
 func CheckIfTokenIsValid() {
 	var timeSinceTokenCreation = time.Now().Sub(TokenCreationDate) / 10e8
 	fmt.Println("The age of the token is: ", timeSinceTokenCreation)

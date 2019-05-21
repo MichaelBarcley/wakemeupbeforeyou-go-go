@@ -91,6 +91,7 @@ func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 
+	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, string(body))
 }
 
@@ -106,6 +107,7 @@ func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(res.Body)
 	results := gjson.Get(string(body), "data.#.rosters.#.players")
 
+	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, results.String())
 }
 
@@ -121,5 +123,6 @@ func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(res.Body)
 	results := gjson.Get(string(body), "data.#.rosters.#.teams")
 
+	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, results.String())
 }

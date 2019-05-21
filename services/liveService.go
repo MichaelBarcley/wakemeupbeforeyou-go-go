@@ -39,22 +39,21 @@ func ProvideLiveData(liveType string) []byte {
 	var results []byte
 	switch liveType {
 	case "players":
-		temp := gjson.GetBytes(liveSeriesData, "data.#.rosters.#.players")
-		if temp.Index > 0 {
-			results = liveSeriesData[temp.Index : temp.Index+len(temp.Raw)]
-		} else {
-			results = []byte(temp.Raw)
-		}
+		filterLiveSeriesData("data.#.rosters.#.players", &results)
 	case "teams":
-		temp := gjson.GetBytes(liveSeriesData, "data.#.rosters.#.teams")
-		if temp.Index > 0 {
-			results = liveSeriesData[temp.Index : temp.Index+len(temp.Raw)]
-		} else {
-			results = []byte(temp.Raw)
-		}
+		filterLiveSeriesData("data.#.rosters.#.teams", &results)
 	default:
 		results = liveSeriesData
 	}
 
 	return results
+}
+
+func filterLiveSeriesData(jsonFilter string, output *[]byte) {
+	temp := gjson.GetBytes(liveSeriesData, jsonFilter)
+	if temp.Index > 0 {
+		*output = liveSeriesData[temp.Index : temp.Index+len(temp.Raw)]
+	} else {
+		*output = []byte(temp.Raw)
+	}
 }

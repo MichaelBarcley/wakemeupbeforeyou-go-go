@@ -20,19 +20,19 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
-	liveSeries := services.ProvideLiveData("series", 120)
+	liveSeries := services.ProvideLiveData("series")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, liveSeries)
 }
 
 func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
-	livePlayers := services.ProvideLiveData("players", 120)
+	livePlayers := services.ProvideLiveData("players")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, livePlayers)
 }
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	liveTeams := services.ProvideLiveData("teams", 120)
+	liveTeams := services.ProvideLiveData("teams")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, liveTeams)
 }

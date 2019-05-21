@@ -30,9 +30,9 @@ func GetAbiosData() {
 }
 
 // ProvideLiveData parses the stored live series data and returns the requested live players/teams/series.
-func ProvideLiveData(liveType string, refreshRate time.Duration) string {
+func ProvideLiveData(liveType string) string {
 	var timeSinceLastQuery = time.Now().Sub(lastAbiosQueryDate) / 10e8
-	if timeSinceLastQuery > refreshRate || liveSeriesData == nil {
+	if timeSinceLastQuery > 90 || liveSeriesData == nil {
 		GetAbiosData()
 	}
 

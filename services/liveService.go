@@ -30,20 +30,31 @@ func GetAbiosData() {
 }
 
 // ProvideLiveData parses the stored live series data and returns the requested live players/teams/series.
-func ProvideLiveData(liveType string) string {
+func ProvideLiveData(liveType string) []byte {
 	var timeSinceLastQuery = time.Now().Sub(lastAbiosQueryDate) / 10e8
 	if timeSinceLastQuery > 90 || liveSeriesData == nil {
 		GetAbiosData()
 	}
 
+	var results []byte
 	switch liveType {
 	case "players":
-		results := gjson.Get(string(liveSeriesData), "data.#.rosters.#.players")
-		return results.Raw
+		temp := gjson.GetBytes(liveSeriesData, "data.#.rosters.#.players")
+		if temp.Index > 0 {
+			results = liveSeriesData[temp.Index : temp.Index+len(temp.Raw)]
+		} else {
+			results = []byte(temp.Raw)
+		}
 	case "teams":
-		results := gjson.Get(string(liveSeriesData), "data.#.rosters.#.teams")
-		return results.Raw
+		temp := gjson.GetBytes(liveSeriesData, "data.#.rosters.#.teams")
+		if temp.Index > 0 {
+			results = liveSeriesData[temp.Index : temp.Index+len(temp.Raw)]
+		} else {
+			results = []byte(temp.Raw)
+		}
 	default:
-		return string(liveSeriesData)
+		results = liveSeriesData
 	}
+
+	return results
 }

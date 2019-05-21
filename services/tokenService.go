@@ -10,11 +10,8 @@ import (
 	"time"
 )
 
-// AccessToken is used to access the Abios Gaming API. On server start it is empty.
-var AccessToken = ""
-
-// TokenCreationDate is the date when the AccessToken was created. On server start it is time.Now() and it is modified in token handling functions.
-var TokenCreationDate = time.Now()
+var accessToken = ""
+var tokenCreationDate = time.Now()
 
 // GetToken is responsible for getting a valid token, if the server has an expired one.
 func GetToken() {
@@ -33,15 +30,15 @@ func GetToken() {
 	m := make(map[string]interface{})
 	json.Unmarshal(body, &m)
 	fmt.Println("Your access token for the next hour is: ", m["access_token"])
-	AccessToken = m["access_token"].(string)
-	TokenCreationDate = time.Now()
+	accessToken = m["access_token"].(string)
+	tokenCreationDate = time.Now()
 }
 
 // CheckIfTokenIsValid checks if the current access token stored on the server is still valid or needs to get a new one from Abios API.
 func CheckIfTokenIsValid() {
-	var timeSinceTokenCreation = time.Now().Sub(TokenCreationDate) / 10e8
+	var timeSinceTokenCreation = time.Now().Sub(tokenCreationDate) / 10e8
 	fmt.Println("The age of the token is: ", timeSinceTokenCreation)
-	if timeSinceTokenCreation > 3600 || AccessToken == "" {
+	if timeSinceTokenCreation > 3600 || accessToken == "" {
 		GetToken()
 	}
 }

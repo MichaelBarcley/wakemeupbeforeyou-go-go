@@ -11,7 +11,7 @@ import (
 // GetLiveAbiosData is responsible for getting the current live /series data from Abios API and parses the information based on the input parameter.
 func GetLiveAbiosData(s string) string {
 	CheckIfTokenIsValid()
-	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + AccessToken
+	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
 	res, err := http.Get(baseURL)
 	if err != nil {
 		log.Fatal(err)

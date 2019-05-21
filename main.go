@@ -9,11 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tidwall/gjson"
+	"./services"
 )
-
-var accessToken = ""
-var tokenCreationDate = time.Now()
 
 func main() {
 	http.HandleFunc("/", indexHandler)
@@ -43,59 +40,9 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 	json.Unmarshal(body, &m)
-	accessToken = m["access_token"].(string)
-	tokenCreationDate = time.Now()
-	fmt.Println(accessToken)
-}
-
-func getToken() {
-	url := "https://api.abiosgaming.com/v2/oauth/access_token"
-	payload := strings.NewReader("grant_type=client_credentials&client_id=test-task&client_secret=9179d8d1b253209e193e7dee77e432ea79e541a5909a026a76")
-	req, _ := http.NewRequest("POST", url, payload)
-	req.Header.Add("content-type", "application/x-www-form-urlencoded")
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	fmt.Println(string(body))
-
-	m := make(map[string]interface{})
-	json.Unmarshal(body, &m)
-	fmt.Println("Your access token for the next hour is: ", m["access_token"])
-	accessToken = m["access_token"].(string)
-	tokenCreationDate = time.Now()
-}
-
-func checkIfTokenIsValid() {
-	var timeSinceTokenCreation = time.Now().Sub(tokenCreationDate) / 10e8
-	fmt.Println("The age of the token is: ", timeSinceTokenCreation)
-	if timeSinceTokenCreation > 3600 || accessToken == "" {
-		getToken()
-	}
-}
-
-func getLiveAbiosData(s string) string {
-	checkIfTokenIsValid()
-	baseURL := "https://api.abiosgaming.com/v2/series?starts_before=now&is_over=false&is_postponed=false&access_token=" + accessToken
-	res, err := http.Get(baseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-
-	switch s {
-	case "players":
-		results := gjson.Get(string(body), "data.#.rosters.#.players")
-		return results.Raw
-	case "teams":
-		results := gjson.Get(string(body), "data.#.rosters.#.teams")
-		return results.Raw
-	default:
-		return string(body)
-	}
+	services.AccessToken = m["access_token"].(string)
+	services.TokenCreationDate = time.Now()
+	fmt.Println(services.AccessToken)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,19 +50,19 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func liveSeriesHandler(w http.ResponseWriter, r *http.Request) {
-	liveSeries := getLiveAbiosData("series")
+	liveSeries := services.GetLiveAbiosData("series")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, liveSeries)
 }
 
 func livePlayersHandler(w http.ResponseWriter, r *http.Request) {
-	livePlayers := getLiveAbiosData("players")
+	livePlayers := services.GetLiveAbiosData("players")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, livePlayers)
 }
 
 func liveTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	liveTeams := getLiveAbiosData("teams")
+	liveTeams := services.GetLiveAbiosData("teams")
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, liveTeams)
 }

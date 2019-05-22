@@ -5,14 +5,16 @@ import (
 	"net/http"
 
 	"./services"
+	"./utilities"
 )
 
 func main() {
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/series/live", liveSeriesHandler)
-	http.HandleFunc("/players/live", livePlayersHandler)
-	http.HandleFunc("/teams/live", liveTeamsHandler)
-	http.ListenAndServe(":8080", nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/series/live", liveSeriesHandler)
+	mux.HandleFunc("/players/live", livePlayersHandler)
+	mux.HandleFunc("/teams/live", liveTeamsHandler)
+	http.ListenAndServe(":8080", utilities.Limit(mux))
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {

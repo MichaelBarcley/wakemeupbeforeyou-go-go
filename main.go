@@ -14,7 +14,7 @@ func main() {
 	mux.HandleFunc("/series/live", liveSeriesHandler)
 	mux.HandleFunc("/players/live", livePlayersHandler)
 	mux.HandleFunc("/teams/live", liveTeamsHandler)
-	http.ListenAndServe(":8080", utilities.Limit(mux))
+	http.ListenAndServe(":8081", utilities.Limit(mux))
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
